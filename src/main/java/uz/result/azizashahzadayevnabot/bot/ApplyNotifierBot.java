@@ -31,12 +31,11 @@ public class ApplyNotifierBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-
     }
 
     public void handleSendApplicationMessage(Application application) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId("-4219076438");
+        sendMessage.setChatId("-1002194548453");
         sendMessage.setParseMode("Markdown");
         sendMessage.setText(
                 "*Новый комментарий*\n\n" +
