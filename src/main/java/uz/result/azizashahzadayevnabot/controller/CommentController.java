@@ -9,7 +9,7 @@ import uz.result.azizashahzadayevnabot.bot.ApplyNotifierBot;
 import uz.result.azizashahzadayevnabot.model.Application;
 
 @RestController
-@RequestMapping("/comment")
+@RequestMapping("/api/comment")
 @RequiredArgsConstructor
 public class CommentController {
 
