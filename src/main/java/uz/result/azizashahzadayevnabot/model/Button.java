@@ -2,16 +2,16 @@ package uz.result.azizashahzadayevnabot.model;
 
 public enum Button {
 
-    MAKE_AN_APPOINTMENT,
+    MAKE_AN_APPOINTMENT,// Записаться на прием
 
-    SIGN_UP,
+    SIGN_UP,// Записаться
 
-    TELEGRAM,
+    TELEGRAM,// Telegram
 
-    CALL,
+    CALL,//
 
-    TELEGRAM_FOOTER,
+    TELEGRAM_FOOTER,// Telegram icon on footer section
 
-    INSTAGRAM_FOOTER
+    INSTAGRAM_FOOTER// Instagram icon on footer section
 
 }
