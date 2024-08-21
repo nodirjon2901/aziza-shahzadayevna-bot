@@ -1,9 +1,6 @@
 package uz.result.azizashahzadayevnabot.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,11 +20,12 @@ public class Counter {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Section section;
+    @Enumerated(EnumType.STRING)
+    private Button section;
 
     private Long countCall;
 
-    private Long countApplication;
+//    private Long countApplication;
 
     @CreationTimestamp
     private LocalDateTime createdDate;

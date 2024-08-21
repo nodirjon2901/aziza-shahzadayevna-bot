@@ -8,7 +8,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.result.azizashahzadayevnabot.model.Application;
+import uz.result.azizashahzadayevnabot.model.Button;
 import uz.result.azizashahzadayevnabot.model.Counter;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -35,6 +40,7 @@ public class ApplyNotifierBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
+
     }
 
     public void handleSendApplicationMessage(Application application) {
@@ -54,39 +60,60 @@ public class ApplyNotifierBot extends TelegramLongPollingBot {
         }
     }
 
-    public void sendCounter(Counter counter) {
-        SendMessage sendMessage=new SendMessage();
+    public void sendCounter(List<Counter> counters, Long totalApplications) {
+        SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(groupChatId);
         StringBuilder textBuilder = new StringBuilder();
 
-        if (counter == null) {
-            textBuilder.append("<b>Еженедельный отчет 📋</b>\n\n")
-                    .append("<b>1. Поступившие заявки:</b> 0\n")
-                    .append("<b>2. Количество звонков:</b> 0\n");
+        textBuilder.append("<b>Еженедельный отчет 📋</b>\n\n");
+
+        if (counters == null || counters.isEmpty()) {
+            textBuilder.append("<b>Поступившие заявки:</b> 0\n")
+                    .append("<b>Общее количество звонков:</b> 0\n");
         } else {
-            if (counter.getCountCall() != null) {
-                if (counter.getCountApplication() != null) {
-                    textBuilder.append("<b>Еженедельный отчет 📋</b>\n\n")
-                            .append(String.format("<b>1. Поступившие заявки:</b> %d\n", counter.getCountApplication()))
-                            .append(String.format("<b>2. Количество звонков:</b> %d\n", counter.getCountCall()));
-                } else {
-                    textBuilder.append("<b>Еженедельный отчет 📋</b>\n\n")
-                            .append("<b>1. Поступившие заявки:</b> 0\n")
-                            .append(String.format("<b>2. Количество звонков:</b> %d\n", counter.getCountCall()));
-                }
+            Map<Button, Long> buttonCountMap = new HashMap<>();
+            long totalCalls = 0;
+
+            for (Counter counter : counters) {
+                Button button = counter.getSection();
+                long countCall = counter.getCountCall() != null ? counter.getCountCall() : 0;
+
+                buttonCountMap.put(button, buttonCountMap.getOrDefault(button, 0L) + countCall);
+                totalCalls += countCall;
             }
+
+            for (Map.Entry<Button, Long> entry : buttonCountMap.entrySet()) {
+                textBuilder.append(String.format("<b>%s:</b> %d\n", getButtonDisplayName(entry.getKey()), entry.getValue()));
+            }
+
+            textBuilder.append(String.format("\n<b>Общее количество заявок:</b> %d\n", totalApplications));
+            textBuilder.append(String.format("<b>Общее количество звонков:</b> %d\n", totalCalls));
         }
 
         String text = textBuilder.toString();
-
         sendMessage.setText(text);
         sendMessage.setParseMode("HTML");
+
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
+
+
+    private String getButtonDisplayName(Button button) {
+        return switch (button) {
+            case MAKE_AN_APPOINTMENT -> "Запись на прием";
+            case SIGN_UP -> "Регистрация";
+            case TELEGRAM -> "Telegram";
+            case CALL -> "Звонок";
+            case TELEGRAM_FOOTER -> "Telegram (Footer)";
+            case INSTAGRAM_FOOTER -> "Instagram (Footer)";
+            default -> button.name();
+        };
+    }
+
 
 
 // Agar ma'lumotlar bazasi ham qo'shilsa bu narsa ish beradi.

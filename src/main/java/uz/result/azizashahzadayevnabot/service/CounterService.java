@@ -6,11 +6,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import uz.result.azizashahzadayevnabot.bot.ApplyNotifierBot;
 import uz.result.azizashahzadayevnabot.model.ApiResponse;
+import uz.result.azizashahzadayevnabot.model.Button;
 import uz.result.azizashahzadayevnabot.model.Counter;
 import uz.result.azizashahzadayevnabot.repository.ApplicationRepository;
 import uz.result.azizashahzadayevnabot.repository.CounterRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,45 +27,32 @@ public class CounterService {
 
     private final ApplyNotifierBot bot;
 
-    private Counter currentCounter;
+    private Map<Button, Long> currentCounterMap = new HashMap<>();
 
-    public ResponseEntity<ApiResponse<?>> addCallNumber() {
-        if (currentCounter == null) {
-            currentCounter = Counter.builder()
-                    .countCall(1L)
-                    .createdDate(LocalDateTime.now())
-                    .build();
-            counterRepository.save(currentCounter);
-        } else {
-            currentCounter.setCountCall(currentCounter.getCountCall() + 1);
-            counterRepository.save(currentCounter);
-        }
+    public ResponseEntity<ApiResponse<?>> addCallNumber(Button button) {
+        currentCounterMap.put(button, currentCounterMap.getOrDefault(button, 0L) + 1);
 
         ApiResponse<?> response = new ApiResponse<>();
-        response.setMessage("Success. Number of calls per week: " + currentCounter.getCountCall());
+        response.setMessage("Success. Number of calls for " + button.name() + ": " + currentCounterMap.get(button));
         return ResponseEntity.ok(response);
     }
 
-    @Scheduled(cron = "0 0 0 * * SUN")
+    @Scheduled(cron = "0 */2 * * * *")// every minute
     public void checkAndSendCounter() throws Exception {
-        Long applicationCount = applicationRepository.countApplicationInOneWeek(LocalDateTime.now().minusWeeks(1), LocalDateTime.now());
-        if (currentCounter == null){
+        Long applicationCount = applicationRepository.countApplicationInOneWeek(LocalDateTime.now().minusMinutes(2), LocalDateTime.now());
+        List<Counter> counterList=new ArrayList<>();
+        for (Map.Entry<Button, Long> entry : currentCounterMap.entrySet()) {
+            Button button = entry.getKey();
+            Long countCall = entry.getValue();
+
             Counter counter = Counter.builder()
-                    .countApplication(applicationCount)
-                    .countCall(0L)
+                    .section(button)
+                    .countCall(countCall)
                     .build();
-            currentCounter = counterRepository.save(counter);
-        } else {
-            if (applicationCount != null) {
-                currentCounter.setCountApplication(applicationCount);
-            }
-            counterRepository.save(currentCounter);
+            counterList.add(counterRepository.save(counter));
         }
-
-        counterRepository.update(currentCounter.getId(), applicationCount);
-        bot.sendCounter(currentCounter);
-        currentCounter = null;
+        bot.sendCounter(counterList,applicationCount);
+        currentCounterMap.clear();
     }
-
 
 }
