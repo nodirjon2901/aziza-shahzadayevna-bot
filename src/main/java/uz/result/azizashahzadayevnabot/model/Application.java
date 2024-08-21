@@ -2,6 +2,9 @@ package uz.result.azizashahzadayevnabot.model;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -14,5 +17,8 @@ public class Application {
     String phoneNum;
 
     String comment;
+
+    @CreationTimestamp
+    LocalDateTime createdDate;
 
 }

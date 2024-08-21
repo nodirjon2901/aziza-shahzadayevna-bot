@@ -8,6 +8,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import uz.result.azizashahzadayevnabot.model.Application;
+import uz.result.azizashahzadayevnabot.model.Counter;
 
 @Component
 @RequiredArgsConstructor
@@ -18,6 +19,9 @@ public class ApplyNotifierBot extends TelegramLongPollingBot {
 
     @Value("${bot.username}")
     private String username;
+
+    @Value("${group.chatId}")
+    private String groupChatId;
 
     @Override
     public String getBotToken() {
@@ -35,7 +39,7 @@ public class ApplyNotifierBot extends TelegramLongPollingBot {
 
     public void handleSendApplicationMessage(Application application) {
         SendMessage sendMessage = new SendMessage();
-        sendMessage.setChatId("-1002194548453");
+        sendMessage.setChatId(groupChatId);
         sendMessage.setParseMode("Markdown");
         sendMessage.setText(
                 "*Новый комментарий*\n\n" +
@@ -49,6 +53,41 @@ public class ApplyNotifierBot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
+
+    public void sendCounter(Counter counter) {
+        SendMessage sendMessage=new SendMessage();
+        sendMessage.setChatId(groupChatId);
+        StringBuilder textBuilder = new StringBuilder();
+
+        if (counter == null) {
+            textBuilder.append("<b>Еженедельный отчет 📋</b>\n\n")
+                    .append("<b>1. Поступившие заявки:</b> 0\n")
+                    .append("<b>2. Количество звонков:</b> 0\n");
+        } else {
+            if (counter.getCountCall() != null) {
+                if (counter.getCountApplication() != null) {
+                    textBuilder.append("<b>Еженедельный отчет 📋</b>\n\n")
+                            .append(String.format("<b>1. Поступившие заявки:</b> %d\n", counter.getCountApplication()))
+                            .append(String.format("<b>2. Количество звонков:</b> %d\n", counter.getCountCall()));
+                } else {
+                    textBuilder.append("<b>Еженедельный отчет 📋</b>\n\n")
+                            .append("<b>1. Поступившие заявки:</b> 0\n")
+                            .append(String.format("<b>2. Количество звонков:</b> %d\n", counter.getCountCall()));
+                }
+            }
+        }
+
+        String text = textBuilder.toString();
+
+        sendMessage.setText(text);
+        sendMessage.setParseMode("HTML");
+        try {
+            execute(sendMessage);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 // Agar ma'lumotlar bazasi ham qo'shilsa bu narsa ish beradi.
 //    Faqat bu narsa uchun avtorizatsiya qilish kerak chunki
