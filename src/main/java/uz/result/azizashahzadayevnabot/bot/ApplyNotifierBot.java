@@ -67,7 +67,7 @@ public class ApplyNotifierBot extends TelegramLongPollingBot {
 
         textBuilder.append("<b>Еженедельный отчет 📋</b>\n\n");
 
-        if (counters == null || counters.isEmpty()) {
+        if ((counters == null || counters.isEmpty() && totalApplications==0)) {
             textBuilder.append("<b>Поступившие заявки:</b> 0\n")
                     .append("<b>Общее количество звонков:</b> 0\n");
         } else {
