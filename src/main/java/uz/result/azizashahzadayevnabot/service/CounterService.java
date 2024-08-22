@@ -37,9 +37,10 @@ public class CounterService {
         return ResponseEntity.ok(response);
     }
 
-    @Scheduled(cron = "0 */2 * * * *")// every minute
+//    @Scheduled(cron = "0 */2 * * * *")// every minute
+    @Scheduled(cron = "0 0 0 * * SUN")
     public void checkAndSendCounter() throws Exception {
-        Long applicationCount = applicationRepository.countApplicationInOneWeek(LocalDateTime.now().minusMinutes(2), LocalDateTime.now());
+        Long applicationCount = applicationRepository.countApplicationInOneWeek(LocalDateTime.now().minusWeeks(1), LocalDateTime.now());
         List<Counter> counterList=new ArrayList<>();
         for (Map.Entry<Button, Long> entry : currentCounterMap.entrySet()) {
             Button button = entry.getKey();

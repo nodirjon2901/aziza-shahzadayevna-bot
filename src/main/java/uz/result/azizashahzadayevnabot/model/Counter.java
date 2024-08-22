@@ -25,8 +25,6 @@ public class Counter {
 
     private Long countCall;
 
-//    private Long countApplication;
-
     @CreationTimestamp
     private LocalDateTime createdDate;
 
