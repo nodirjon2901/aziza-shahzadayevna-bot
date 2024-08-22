@@ -11,7 +11,7 @@ import uz.result.azizashahzadayevnabot.model.Button;
 import uz.result.azizashahzadayevnabot.service.CounterService;
 
 @RestController
-@RequestMapping("/counter")
+@RequestMapping("/api/counter")
 @RequiredArgsConstructor
 public class CounterController {
 
