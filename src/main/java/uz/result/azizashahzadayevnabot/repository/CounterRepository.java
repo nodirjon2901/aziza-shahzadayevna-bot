@@ -8,12 +8,18 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uz.result.azizashahzadayevnabot.model.Counter;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Repository
 public interface CounterRepository extends JpaRepository<Counter, Long> {
 
-    @Transactional
-    @Modifying
-    @Query(value = "update counter set count_application=:numberApp where id=:counterId", nativeQuery = true)
-    void update(@Param("counterId") Long counterId, @Param("numberApp") Long numberApp);
+//    @Transactional
+//    @Modifying
+//    @Query(value = "update counter set count_application=:numberApp where id=:counterId", nativeQuery = true)
+//    void update(@Param("counterId") Long counterId, @Param("numberApp") Long numberApp);
+
+    List<Counter> findAllByCreatedDateBetween(LocalDateTime startDate, LocalDateTime endDate);
+
 
 }

@@ -102,34 +102,28 @@ public class ApplyNotifierBot extends TelegramLongPollingBot {
         } else {
             Map<Button, Long> buttonCountMap = new HashMap<>();
             long totalCalls = 0;
-            long totalRegistrations = 0;
             long totalAppointments = 0;
 
             for (Counter counter : counters) {
                 Button button = counter.getSection();
                 long countCall = counter.getCountCall() != null ? counter.getCountCall() : 0;
 
-                if (button == Button.MAKE_AN_APPOINTMENT) {
-                    totalAppointments += countCall;  // Запись на прием
-                } else if (button == Button.SIGN_UP) {
-                    totalRegistrations += countCall;  // Регистрация
-                } else {
-                    // Boshqa buttonlar uchun hisob-kitob qilish
+                if (button == Button.MAKE_AN_APPOINTMENT || button == Button.SIGN_UP) {
+                    totalAppointments += countCall;
+                }  else {
                     buttonCountMap.put(button, buttonCountMap.getOrDefault(button, 0L) + countCall);
                 }
 
                 totalCalls += countCall;
             }
 
-            long totalCombined = totalAppointments + totalRegistrations;
-            textBuilder.append(String.format("<b>Запись на прием:</b> %d\n", totalCombined));
+            textBuilder.append(String.format("<b>Запись на прием:</b> %d\n", totalAppointments));
 
             for (Map.Entry<Button, Long> entry : buttonCountMap.entrySet()) {
                 textBuilder.append(String.format("<b>%s:</b> %d\n", getButtonDisplayName(entry.getKey()), entry.getValue()));
             }
 
             textBuilder.append(String.format("\n<b>Общее количество заявок:</b> %d\n", totalApplications));
-//            textBuilder.append(String.format("<b>Общее количество звонков:</b> %d\n", totalCalls));
         }
 
         String text = textBuilder.toString();
