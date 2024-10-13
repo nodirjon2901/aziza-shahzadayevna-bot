@@ -42,7 +42,7 @@ public class CounterService {
     @Scheduled(cron = "0 0 0 * * SUN")
     public void checkAndSendCounter() {
         LocalDateTime now = LocalDateTime.now();
-        LocalDateTime oneMinuteAgo = now.minusWeeks(4);
+        LocalDateTime oneMinuteAgo = now.minusWeeks(1);
 
         List<Counter> counterList = counterRepository.findAllByCreatedDateBetween(oneMinuteAgo, now);
 
